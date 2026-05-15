@@ -28,7 +28,7 @@ SMTP_USER         = os.getenv("SMTP_USER",         "agent@tuodominio.com")
 SMTP_PASS         = os.getenv("SMTP_PASS",         "la-tua-app-password")
 
 SOURCE_URL  = "https://searchherald.com/"
-LOG_FILE    = "/var/log/seo_agent.log"
+LOG_FILE    = "logs/seo_agent.log"
 MODEL       = "claude-sonnet-4-20250514"
 MAX_TOKENS  = 1200
 # ---------------------------------------------------------------------------
