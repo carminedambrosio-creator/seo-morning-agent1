@@ -186,8 +186,14 @@ def send_email(post: str, articles: list[dict]) -> None:
         for a in articles
     )
 
+    # Sezione fonti con anchor text cliccabili
+    fonti_html = "".join(
+        f'<a href="{a["url"]}" style="display:block;color:#0a66c2;font-size:13px;'
+        f'margin-bottom:6px;text-decoration:none;" target="_blank">🔗 {a["title"]}</a>'
+        for a in articles
+    )
+
     post_html = post.replace("\n", "<br>")
-    # bold markdown → <strong>
     post_html = re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", post_html)
 
     html_body = f"""
@@ -205,6 +211,13 @@ def send_email(post: str, articles: list[dict]) -> None:
         <div style="background:#f7f9fb;border-left:3px solid #0a66c2;padding:16px 20px;border-radius:0 6px 6px 0;font-size:14px;line-height:1.75;">
           {post_html}
         </div>
+
+        <!-- SEZIONE FONTI -->
+        <div style="margin-top:20px;padding:16px;background:#f0f4ff;border-radius:6px;">
+          <p style="font-size:12px;color:#888;margin:0 0 10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;">📚 Fonti utilizzate</p>
+          {fonti_html}
+        </div>
+
         <p style="font-size:11px;color:#bbb;margin:20px 0 0;text-align:center;">
           Generato da SEO Morning Post Agent · Eskimoz
         </p>
