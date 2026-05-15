@@ -15,11 +15,10 @@ from datetime import datetime
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from bs4 import BeautifulSoup
-
 # ---------------------------------------------------------------------------
 # CONFIGURAZIONE — modifica questi valori o usali come variabili d'ambiente
 # ---------------------------------------------------------------------------
-ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "sk-ant-XXXXXXXXXX")
+ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "sk-ant-XXXXXXXXXX").strip()
 EMAIL_FROM        = os.getenv("EMAIL_FROM",        "agent@tuodominio.com")
 EMAIL_TO          = os.getenv("EMAIL_TO",          "carmine@eskimoz.it")
 SMTP_HOST         = os.getenv("SMTP_HOST",         "smtp.gmail.com")
