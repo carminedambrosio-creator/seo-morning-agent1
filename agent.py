@@ -15,19 +15,7 @@ from datetime import datetime
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from bs4 import BeautifulSoup
-import logging
-import os
 
-# Create logs directory if it doesn't exist
-import os
-os.makedirs("logs", exist_ok=True)
-
-# Configure logging
-logging.basicConfig(
-    filename=os.path.join(log_dir, 'seo_agent.log'),
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
-)
 # ---------------------------------------------------------------------------
 # CONFIGURAZIONE — modifica questi valori o usali come variabili d'ambiente
 # ---------------------------------------------------------------------------
@@ -39,23 +27,16 @@ SMTP_PORT         = int(os.getenv("SMTP_PORT",     "587"))
 SMTP_USER         = os.getenv("SMTP_USER",         "agent@tuodominio.com")
 SMTP_PASS         = os.getenv("SMTP_PASS",         "la-tua-app-password")
 
-SOURCE_URL  = "https://searchherald.com/"
-LOG_FILE    = "logs/seo_agent.log"
-MODEL       = "claude-sonnet-4-20250514"
-MAX_TOKENS  = 1200
+SOURCE_URL = "https://searchherald.com/"
+LOG_FILE   = "logs/seo_agent.log"
+MODEL      = "claude-sonnet-4-20250514"
+MAX_TOKENS = 1200
+
 # ---------------------------------------------------------------------------
-import os
+# LOGGING
+# ---------------------------------------------------------------------------
+os.makedirs(os.path.dirname(LOG_FILE), exist_ok=True)
 
-LOG_FILE = 'logs/seo_agent.log'
-os.makedirs(os.path.dirname(LOG_FILE), exist_ok=True)  # ← aggiunge questa riga
-
-logging.basicConfig(
-    level=logging.INFO,
-    handlers=[
-        logging.FileHandler(LOG_FILE),
-        logging.StreamHandler()
-    ]
-)
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s",
