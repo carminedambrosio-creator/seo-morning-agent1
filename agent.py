@@ -19,8 +19,8 @@ import logging
 import os
 
 # Create logs directory if it doesn't exist
-log_dir = 'logs'
-os.makedirs(log_dir, exist_ok=True)
+import os
+os.makedirs("logs", exist_ok=True)
 
 # Configure logging
 logging.basicConfig(
