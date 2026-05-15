@@ -7,7 +7,8 @@ on:
     # Cambia in 07:00 UTC da marzo a ottobre se vuoi orario legale esatto
     - cron: '0 6 * * 1-5'
   workflow_dispatch:  # permette run manuale dal pannello GitHub
-
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 jobs:
   generate-post:
     runs-on: ubuntu-latest
