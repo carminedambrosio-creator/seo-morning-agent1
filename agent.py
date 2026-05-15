@@ -32,7 +32,18 @@ LOG_FILE    = "logs/seo_agent.log"
 MODEL       = "claude-sonnet-4-20250514"
 MAX_TOKENS  = 1200
 # ---------------------------------------------------------------------------
+import os
 
+LOG_FILE = 'logs/seo_agent.log'
+os.makedirs(os.path.dirname(LOG_FILE), exist_ok=True)  # ← aggiunge questa riga
+
+logging.basicConfig(
+    level=logging.INFO,
+    handlers=[
+        logging.FileHandler(LOG_FILE),
+        logging.StreamHandler()
+    ]
+)
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s",
