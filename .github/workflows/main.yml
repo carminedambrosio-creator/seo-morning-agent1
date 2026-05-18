@@ -2,11 +2,10 @@ name: SEO Morning Post Agent
 
 on:
   schedule:
-    # 08:00 Europe/Rome = 06:00 UTC (ora solare) / 07:00 UTC (ora legale)
-    # Usiamo 06:00 UTC per coprire entrambi i periodi (ottobre-marzo)
-    # Cambia in 07:00 UTC da marzo a ottobre se vuoi orario legale esatto
     - cron: '0 6 * * 1-5'
-  workflow_dispatch:  # permette run manuale dal pannello GitHub
+  workflow_dispatch:
+  repository_dispatch:
+    types: [cron-trigger]
 
 jobs:
   generate-post:
