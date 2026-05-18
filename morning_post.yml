@@ -1,3 +1,33 @@
+import time  # ← deve essere in cima al file con gli altri import
+
+def call_claude(system: str, user: str, retries: int = 4) -> str:
+    """Chiama l'API Anthropic con retry automatico in caso di sovraccarico."""
+    payload = {
+        "model": MODEL,
+        "max_tokens": MAX_TOKENS,
+        "system": system,
+        "messages": [{"role": "user", "content": user}]
+    }
+    for attempt in range(retries):
+        resp = requests.post(
+            "https://api.anthropic.com/v1/messages",
+            headers={
+                "x-api-key": ANTHROPIC_API_KEY,
+                "anthropic-version": "2023-06-01",
+                "content-type": "application/json"
+            },
+            json=payload,
+            timeout=60
+        )
+        if resp.status_code == 529:
+            wait = 15 * (attempt + 1)  # 15s, 30s, 45s, 60s
+            log.warning("API sovraccarica (529), tentativo %d/%d — attendo %ds...", attempt + 1, retries, wait)
+            time.sleep(wait)
+            continue
+        resp.raise_for_status()
+        return resp.json()["content"][0]["text"]
+
+    raise RuntimeError(f"API Anthropic non disponibile dopo {retries} tentativi (529).")
 def select_articles(headlines: list[dict]) -> list[dict]:
     """Usa Claude per selezionare i 5 articoli più rilevanti (con margine per fallback)."""
     log.info("Selezione articoli con Claude...")
