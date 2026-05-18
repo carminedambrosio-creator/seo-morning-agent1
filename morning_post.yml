@@ -1,5 +1,34 @@
 name: SEO Morning Post Agent
+import time
 
+def call_claude(system: str, user: str, retries: int = 3) -> str:
+    """Chiama l'API Anthropic e restituisce il testo della risposta."""
+    payload = {
+        "model": MODEL,
+        "max_tokens": MAX_TOKENS,
+        "system": system,
+        "messages": [{"role": "user", "content": user}]
+    }
+    for attempt in range(retries):
+        resp = requests.post(
+            "https://api.anthropic.com/v1/messages",
+            headers={
+                "x-api-key": ANTHROPIC_API_KEY,
+                "anthropic-version": "2023-06-01",
+                "content-type": "application/json"
+            },
+            json=payload,
+            timeout=60
+        )
+        if resp.status_code == 529:
+            wait = 10 * (attempt + 1)  # 10s, 20s, 30s
+            log.warning("API sovraccarica (529), retry %d/%d tra %ds...", attempt + 1, retries, wait)
+            time.sleep(wait)
+            continue
+        resp.raise_for_status()
+        return resp.json()["content"][0]["text"]
+
+    raise RuntimeError("API Anthropic non disponibile dopo 3 tentativi (529).")
 on:
   schedule:
     - cron: '0 7 * * 1-5'  # 08:00 ora legale italiana (UTC+2), ora solare arriva alle 08:00 UTC+1
