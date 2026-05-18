@@ -29,11 +29,11 @@ def call_claude(system: str, user: str, retries: int = 4) -> str:
 
     raise RuntimeError(f"API Anthropic non disponibile dopo {retries} tentativi (529).")
 def select_articles(headlines: list[dict]) -> list[dict]:
-    """Usa Claude per selezionare i 5 articoli più rilevanti (con margine per fallback)."""
+    """Usa Claude per selezionare gli 8 candidati più rilevanti."""
     log.info("Selezione articoli con Claude...")
     system = (
         "Sei un esperto SEO e AI strategist. Analizza questi titoli di notizie SEO/AI "
-        "e seleziona i 5 più rilevanti e attuali per un professionista SEO italiano nel 2026. "
+        "e seleziona gli 8 più rilevanti e attuali per un professionista SEO italiano nel 2026. "
         "Preferisci: aggiornamenti algoritmo Google, AI Overview, LLM search, AEO, GEO, "
         "studi su organic traffic, AI agents. Evita notizie su Google Ads o Merchant Center. "
         "Rispondi SOLO con JSON valido, zero testo fuori dal JSON:\n"
@@ -44,7 +44,7 @@ def select_articles(headlines: list[dict]) -> list[dict]:
     clean = re.sub(r"```json|```", "", raw).strip()
     data = json.loads(clean)
     selected = []
-    for item in data.get("selected", [])[:5]:
+    for item in data.get("selected", [])[:8]:
         idx = item.get("index", 0)
         selected.append({
             "title": item.get("title") or headlines[idx]["title"],
@@ -63,16 +63,19 @@ def pick_readable_articles(candidates: list[dict], needed: int = 2) -> list[dict
             break
         log.info("Verifico leggibilità: %s", art["url"])
         text = fetch_article_text(art["url"])
-        if text and len(text) > 200:
+        if text and len(text) > 100:   # soglia abbassata da 200 a 100
             art["text"] = text
             readable.append(art)
-            log.info("✅ Leggibile: %s", art["title"][:60])
+            log.info("✅ Leggibile (%d chars): %s", len(text), art["title"][:60])
         else:
-            log.warning("🚫 Bloccato o vuoto, salto: %s", art["title"][:60])
+            log.warning("🚫 Bloccato o vuoto (%d chars), salto: %s", len(text) if text else 0, art["title"][:60])
+
+    log.info("Articoli leggibili trovati: %d / %d richiesti", len(readable), needed)
+
     if not readable:
         raise ValueError("Nessun articolo leggibile trovato tra i candidati.")
-    return readable
 
+    return readable
 
 def generate_post(article: dict) -> str:
     """Genera UN post LinkedIn per un singolo articolo."""
