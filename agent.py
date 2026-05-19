@@ -71,6 +71,7 @@ def fetch_headlines(url: str) -> list[dict]:
             and href.startswith("http")
             and "searchherald.com/topic" not in href
             and "searchherald.com/archive" not in href
+            and "searchengineland.com" not in href  # Esclude Search Engine Land
             and href not in seen
         ):
             headlines.append({"title": title, "url": href})
@@ -78,14 +79,7 @@ def fetch_headlines(url: str) -> list[dict]:
 
     log.info("Trovati %d titoli", len(headlines))
     return headlines[:25]
-if (
-    len(title) > 25
-    and href.startswith("http")
-    and "searchherald.com/topic" not in href
-    and "searchherald.com/archive" not in href
-    and "searchengineland.com" not in href   # ← aggiungi questa riga
-    and href not in seen
-):
+
 
 def fetch_article_text(url: str, max_chars: int = 2000) -> str:
     """Scarica il testo principale di un articolo."""
