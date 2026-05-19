@@ -1,4 +1,12 @@
 import time  # ← deve essere in cima al file con gli altri import
+import re
+import json
+import smtplib
+from datetime import datetime
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+
+# Nota: Assicurati che le costanti (MODEL, MAX_TOKENS, ANTHROPIC_API_KEY, ecc.) siano definite sopra.
 
 def call_claude(system: str, user: str, retries: int = 4) -> str:
     """Chiama l'API Anthropic con retry automatico in caso di sovraccarico."""
@@ -28,6 +36,8 @@ def call_claude(system: str, user: str, retries: int = 4) -> str:
         return resp.json()["content"][0]["text"]
 
     raise RuntimeError(f"API Anthropic non disponibile dopo {retries} tentativi (529).")
+
+
 def select_articles(headlines: list[dict]) -> list[dict]:
     """Usa Claude per selezionare gli 8 candidati più rilevanti."""
     log.info("Selezione articoli con Claude...")
@@ -77,6 +87,7 @@ def pick_readable_articles(candidates: list[dict], needed: int = 2) -> list[dict
 
     return readable
 
+
 def generate_post(article: dict) -> str:
     """Genera UN post LinkedIn per un singolo articolo."""
     log.info("Generazione post per: %s", article["title"][:60])
@@ -86,7 +97,7 @@ def generate_post(article: dict) -> str:
         "Sei Carmine, Client & SEO Director di Eskimoz, agenzia SEO italiana. "
         "Scrivi UN post LinkedIn in italiano basato sulla notizia qui sotto.\n\n"
         "STILE OBBLIGATORIO:\n"
-        "- Tono diretto, concreto, autorevole ma non accademico\n"
+        "- Tono directo, concreto, autorevole ma non accademico\n"
         "- Emoji come marcatori strutturali (parsimonia, max 4-5 nel post)\n"
         "- Bullet point sintetici per i punti chiave\n"
         "- **Bold** solo su dati e concetti chiave\n"
