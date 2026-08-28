@@ -146,10 +146,17 @@ def select_articles(headlines: list[dict]) -> list[dict]:
     selected = []
     for item in data.get("selected", [])[:8]:
         idx = item.get("index", 0)
+        url = item.get("url") or headlines[idx]["url"]
+        
+        # Validate URL - skip invalid or N/A URLs
+        if not url or not url.startswith("http") or url == "N/A":
+            log.warning("URL non valido, salto: %s", url)
+            continue
+            
         selected.append({
             "title": item.get("title") or headlines[idx]["title"],
-            "url":   item.get("url")   or headlines[idx]["url"],
-            "why":   item.get("why", "")
+            "url": url,
+            "why": item.get("why", "")
         })
     log.info("Selezionati %d candidati", len(selected))
     return selected
@@ -171,19 +178,6 @@ def pick_readable_articles(candidates: list[dict], needed: int = 2) -> list[dict
             log.warning("🚫 Bloccato o vuoto (%d chars), salto: %s", len(text) if text else 0, art["title"][:60])
 
     log.info("Articoli leggibili trovati: %d / %d richiesti", len(readable), needed)
-
-    if not readable:
-        raise ValueError("Nessun articolo leggibile trovato tra i candidati.")
-# Dentro la funzione pick_readable_articles in agent.py
-for cand in candidates:
-    url = cand.get("url", "")
-    
-    # Filtra le stringhe che non iniziano con http:// o https://
-    if not url.startswith(("http://", "https://")):
-        logger.warning(f"URL non valido ignorato: '{url}'")
-        continue
-        
-    # Prosegui con il resto della logica di lettura...
     return readable
 
 
@@ -291,6 +285,10 @@ def main():
 
         candidates = select_articles(headlines)
         articles   = pick_readable_articles(candidates, needed=2)
+        
+        if not articles:
+            log.warning("Nessun articolo leggibile disponibile oggi. Email non inviata.")
+            return
 
         posts_data = []
         for art in articles:
