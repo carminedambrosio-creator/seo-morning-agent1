@@ -174,7 +174,16 @@ def pick_readable_articles(candidates: list[dict], needed: int = 2) -> list[dict
 
     if not readable:
         raise ValueError("Nessun articolo leggibile trovato tra i candidati.")
-
+# Dentro la funzione pick_readable_articles in agent.py
+for cand in candidates:
+    url = cand.get("url", "")
+    
+    # Filtra le stringhe che non iniziano con http:// o https://
+    if not url.startswith(("http://", "https://")):
+        logger.warning(f"URL non valido ignorato: '{url}'")
+        continue
+        
+    # Prosegui con il resto della logica di lettura...
     return readable
 
 
